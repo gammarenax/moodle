@@ -85,7 +85,10 @@ The next three lines variables are the ones that need to be changed for your upl
 // Change this if this file is named otherwise or moves somewhere else.
 $returnurl = new moodle_url('/admin/tool/uploaduser/autouploaduser.php');
 // This is where the file location is set. Change location as needed.
-$customfileLocation = "$CFG->dataroot/moodleimport/userimport.csv";
+$customfileLocation = "$CFG->dataroot/moodleimport/";
+$customfileName = "LOHN Personalstamm Moodle.txt";
+$customfileNameReplacement = "LOHN Personalstamm Moodle - vorherige Version.txt";
+$filePathName = $customfileLocation . $customfileName;
 // If the file that is linked above does not include email addresses, it will use $defaultmail
 // It should be noted that email addresses will not change if it is not in the upload file.
 $defaultmail = "moodle@gammarenax.ch";
@@ -154,10 +157,10 @@ $customDelimiterName = 'comma';
 
 if (empty($iid)) {
 
-    if (file_exists($customfileLocation)) {
+    if (file_exists($filePathName)) {
         $iid = csv_import_reader::get_new_iid('uploaduser');
         $cir = new csv_import_reader($iid, 'uploaduser');
-        $content = file_get_contents($customfileLocation);
+        $content = file_get_contents($filePathName);
         $readcount = $cir->load_csv_content($content, $customEncoding, $customDelimiterName);
 
         $csvloaderror = $cir->get_error();
@@ -169,7 +172,8 @@ if (empty($iid)) {
 // test if columns ok
         $filecolumns = uu_validate_user_upload_columns($cir, $STD_FIELDS, $PRF_FIELDS, $returnurl);
 // continue to form2
-
+        rename($filePathName, $customfileLocation . $customfileNameReplacement);
+        
     } else {
         echo $OUTPUT->header();
 
